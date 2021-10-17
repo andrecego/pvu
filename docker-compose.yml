@@ -16,6 +16,7 @@ services:
       - "3035:3035"
     depends_on:
       - db
+      - sidekiq
     env_file:
       - .env.development
 
@@ -23,6 +24,19 @@ services:
     image: postgres:12.1
     volumes:
       - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis
+
+  sidekiq:
+    build: .
+    command: "bundle exec sidekiq"
+    volumes:
+      - .:/app:cached
+    depends_on:
+      - redis
+    env_file:
+      - .env.development
 
 volumes:
   postgres-data:
